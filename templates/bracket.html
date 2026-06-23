@@ -1,0 +1,100 @@
+<!doctype html>
+
+{% if message %}
+  <h2>{{message}}</h2>
+{% endif %}
+
+<!-- bracket = (bracket_id, title, description, status, entrant_count, host_username) -->
+<title>{{bracket[1]}}</title>
+
+<h1>{{bracket[1]}}</h1>
+
+<p>
+  Host: {{bracket[5]}} |
+  Entrants: {{bracket[4]}} |
+  Status: <b>{{bracket[3]}}</b>
+</p>
+{% if bracket[3] == 'predictions_open' %}
+<form action="{{ url_for('start_voting', bracket_id=bracket[0]) }}" method="POST">
+    <input type="submit" value="Start Round 1 Voting">
+</form>
+<br>
+{% endif %}
+{% if bracket[2] %}
+  <p>{{bracket[2]}}</p>
+{% endif %}
+
+<!-- matchup = (matchup_id, round, slot, entrant_a_name, entrant_b_name, winner_name, votes_a, votes_b) -->
+<h3>Matchups</h3>
+
+<a href="{{ url_for('champion_path', bracket_id=bracket[0]) }}">View Champion Path</a>
+<br><br>
+
+<table border='1' cellpadding='4'>
+  <tr>
+    <th>Round</th>
+    <th>Slot</th>
+    <th>Entrant A</th>
+    <th>Votes A</th>
+    <th>Votes B</th>
+    <th>Entrant B</th>
+    <th>Winner</th>
+  </tr>
+  {% for m in matchups %}
+    <tr>
+        <td>{{m[1]}}</td>
+        <td>{{m[2]}}</td>
+        <td>{% if m[3] %}{{m[3]}}{% else %}(TBD){% endif %}</td>
+        <td>{{m[6]}}</td>
+        <td>{{m[7]}}</td>
+        <td>{% if m[4] %}{{m[4]}}{% else %}(TBD){% endif %}</td>
+        
+        <td>
+            {% if m[5] %}
+                {{m[5]}} 
+            {% else %}
+            
+{% if bracket[3] == 'round_1' %}
+
+<form action='/vote' method='POST'>
+    <input type='hidden' name='bracket_id' value='{{bracket[0]}}'>
+    <input type='hidden' name='matchup_id' value='{{m[0]}}'>
+
+    <select name='entrant_id'>
+        <option value='{{m[8]}}'>{{m[3]}}</option>
+        <option value='{{m[9]}}'>{{m[4]}}</option>
+    </select>
+
+    <input type='submit' value='Vote'>
+</form>
+
+{% endif %}
+
+{% if bracket[3] == 'predictions_open' %}
+
+<form action='/predict' method='POST'>
+    <input type='hidden' name='bracket_id' value='{{bracket[0]}}'>
+    <input type='hidden' name='matchup_id' value='{{m[0]}}'>
+
+    <label>My Prediction:</label>
+
+    <select name='entrant_name'>
+        <option value='{{m[3]}}'>{{m[3]}}</option>
+        <option value='{{m[4]}}'>{{m[4]}}</option>
+    </select>
+
+    <input type='submit' value='Save Prediction'>
+</form>
+
+{% endif %}
+            {% endif %}
+        </td>
+    </tr>
+{% endfor %}
+</table>
+
+<br />
+<ul>
+  <li><a href='/browse'>Browse brackets</a></li>
+  <li><a href='/'>Home</a></li>
+</ul>

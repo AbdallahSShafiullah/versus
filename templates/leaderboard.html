@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+<h1>Global Leaderboard</h1>
+<table>
+    <tr><th>User</th><th>Points</th></tr>
+    {% for row in leaderboard %}
+    <tr><td>{{ row[0] }}</td><td>{{ row[1] }}</td></tr>
+    {% endfor %}
+</table>
+<a href="/">Home</a>

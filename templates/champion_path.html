@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+    <title>Champion Path</title>
+    <table border="1" cellpadding="5">
+        <tr>
+            <th>Round</th>
+            <th>Matchup ID</th>
+            <th>Winner ID</th>
+        </tr>
+        {% for m in path %}
+        <tr>
+            <td>{{ m[1] }}</td>
+            <td>{{ m[0] }}</td>
+            <td>{{ m[5] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    
+    <br>
+    <a href="/">Home</a>
