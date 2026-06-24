@@ -299,7 +299,7 @@ def view_bracket(bracket_id):
 	return render_template('bracket.html', bracket=bracket, matchups=matchups)
 # end bracket view code
 
-# begin extended features (Predictions, Votes, Leaderboard, Comments, Admin)
+# begin my features (Predictions, Votes, Leaderboard, Champion Path, comments, follows)
 
 @app.route('/predict', methods=['POST'])
 @flask_login.login_required
@@ -428,38 +428,13 @@ def call_close_round(bracket_id, round_num):
     return redirect(url_for('view_bracket', bracket_id=bracket_id))
 
 
-@app.route('/comment', methods=['POST'])
-@flask_login.login_required
-def post_comment():
 
-    uid = getUserIdFromUsername(flask_login.current_user.id)
-    
-   
-    bracket_id = request.form.get('bracket_id')
-    matchup_id = request.form.get('matchup_id')
-    selected_name = request.form.get('entrant_name')
-
-    cursor = conn.cursor()
-    
-    
-    cursor.execute("SELECT entrant_id FROM Entrants WHERE name = %s", (selected_name,))
-    result = cursor.fetchone()
-    
-    if result:
-        entrant_id = result[0]
-        
-        cursor.execute("INSERT INTO Predictions (user_id, matchup_id, entrant_id) VALUES (%s, %s, %s)", 
-                       (uid, matchup_id, entrant_id))
-        conn.commit()
-    
-    cursor.close()
-    return redirect(url_for('view_bracket', bracket_id=bracket_id))
 
 
 @app.route('/leaderboard', methods=['GET'])
 def leaderboard():
     cursor = conn.cursor()
-    # Using window functions as specified in assignment
+    
     query = """
         SELECT u.username, 
                COALESCE(SUM(p.points), 0) AS total_points,
@@ -501,25 +476,6 @@ def champion_path(bracket_id):
     path = cursor.fetchall()
     cursor.close()
     return render_template('champion_path.html', path=path)
-
-
-@app.route('/follow/<username>', methods=['POST'])
-@flask_login.login_required
-def follow_user(username):
-    follower_id = getUserIdFromUsername(flask_login.current_user.id)
-    followed_id = getUserIdFromUsername(username)
-    
-    cursor = conn.cursor()
-    try:
-        cursor.execute("INSERT INTO Follows (follower_id, followed_id) VALUES ('{0}', '{1}')".format(follower_id, followed_id))
-        conn.commit()
-    except Exception as e:
-        print(e)
-    finally:
-        cursor.close()
-    return redirect(url_for('home'))
-
-
 
 
 # end of my added code for features
